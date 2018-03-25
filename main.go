@@ -19,12 +19,13 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 	reg := regexp.MustCompile("coretemp|input|_")
 	tempLower := 40.0
 	tempUpper := 75.0
+	i := 0
 
 	for _, temp := range temps {
 		k := temp.SensorKey
 		if strings.Contains(temp.SensorKey, "_input") {
 			k = reg.ReplaceAllString(k, "")
-			color := odroid.ColorBlue
+			color := odroid.ColorGreen
 
 			if temp.Temperature < tempUpper && temp.Temperature > tempLower {
 				color = odroid.ColorYellow
@@ -32,12 +33,19 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 				color = odroid.ColorRed
 			}
 
-			builder.WriteString(fmt.Sprintf("\r\n\033[3%dm%s: \033[3%dm%.0fC", odroid.ColorWhite, k, color, temp.Temperature))
+			prefix := ""
+
+			if i%2 == 0 {
+				prefix = "\r\n"
+			}
+
+			i++
+			builder.WriteString(fmt.Sprintf("%s\033[3%dm%s:\033[3%dm%.0fC ", prefix, odroid.ColorWhite, k, color, temp.Temperature))
 		}
 	}
 
 	odr.Fg(odroid.ColorBlue)
-	odr.WriteString("Temp:")
+	odr.WriteString("TEMP:")
 	odr.ColorReset()
 	odr.WriteString(builder.String())
 }
@@ -45,7 +53,7 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 func OSStatus(odr *odroid.OdroidShowBoard) {
 	uptime, _ := host.Uptime()
 	duration, _ := time.ParseDuration(fmt.Sprintf("%ds", uptime))
-	odr.Fg(odroid.ColorRed)
+	odr.Fg(odroid.ColorGreen)
 	odr.WriteString("UP:")
 	odr.ColorReset()
 	odr.WriteString(duration.String())
@@ -71,7 +79,7 @@ func MemStatus(odr *odroid.OdroidShowBoard) {
 		mem = mem / 1000
 		label = "GB"
 	}
-	odr.WriteString(fmt.Sprintf("%.0f%% out of %v%s", v.UsedPercent, mem, label))
+	odr.WriteString(fmt.Sprintf("%.0f%% %v%s", v.UsedPercent, mem, label))
 }
 
 func main() {
@@ -81,8 +89,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer odr.Sync()
-
 	odr.Clear()
 
 	for {
@@ -90,12 +96,18 @@ func main() {
 		LoadStatus(odr)
 		odr.Ln()
 		MemStatus(odr)
-		odr.Ln()
+		odr.WriteString(" ")
 		OSStatus(odr)
 		odr.Ln()
 		SensorsStatus(odr)
+		odr.Ln()
 
-		odr.Sync()
+		err = odr.Sync()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		time.Sleep(time.Second)
 	}
 
