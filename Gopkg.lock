@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Gonzih/odroid-show-golang"
   packages = ["."]
-  revision = "0e5dd3e267610d0fdaeb7a2b20ba0769582a0d0a"
+  revision = "1610cb9a7aed1f7822da835a3916618ac425e89a"
 
 [[projects]]
   name = "github.com/StackExchange/wmi"
@@ -25,7 +25,6 @@
 [[projects]]
   name = "github.com/shirou/gopsutil"
   packages = [
-    "cpu",
     "disk",
     "host",
     "internal/common",
@@ -36,12 +35,6 @@
   ]
   revision = "5776ff9c7c5d063d574ef53d740f75c68b448e53"
   version = "v2.18.02"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/shirou/w32"
-  packages = ["."]
-  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
   branch = "master"
