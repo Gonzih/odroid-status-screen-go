@@ -25,14 +25,23 @@
 [[projects]]
   name = "github.com/shirou/gopsutil"
   packages = [
+    "cpu",
+    "disk",
     "host",
     "internal/common",
     "load",
     "mem",
+    "net",
     "process"
   ]
   revision = "5776ff9c7c5d063d574ef53d740f75c68b448e53"
   version = "v2.18.02"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shirou/w32"
+  packages = ["."]
+  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
   branch = "master"
@@ -52,6 +61,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1bb53463ca2c0c9af7d7c2de18894cd13f6602c28b5f495923e5b30c0c6bb121"
+  inputs-digest = "b9666d584905642a312adbc80c3b507603244f6855c35460016de2f04424d841"
   solver-name = "gps-cdcl"
   solver-version = 1

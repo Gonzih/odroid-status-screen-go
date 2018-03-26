@@ -1,22 +1,77 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"net"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/Gonzih/odroid-show-golang"
+	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
+	netstatus "github.com/shirou/gopsutil/net"
 )
 
+func DisksStatus(odr *odroid.OdroidShowBoard, paths []string) {
+	odr.Fg(odroid.ColorRed)
+	odr.WriteString("DISKS:")
+	odr.ColorReset()
+
+	for _, path := range paths {
+
+		usage, err := disk.Usage(path)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		odr.WriteString(fmt.Sprintf("%s %.0f%% ", path, usage.UsedPercent))
+	}
+}
+
+func NetworkStatus(odr *odroid.OdroidShowBoard) {
+	ifaces, err := netstatus.Interfaces()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var addrs strings.Builder
+
+	for _, iface := range ifaces {
+		for _, addr := range iface.Addrs {
+			ip, _, err := net.ParseCIDR(addr.Addr)
+			if err == nil {
+				if !ip.IsLoopback() {
+					ip4 := ip.To4()
+					if ip4 != nil {
+						addrs.WriteString(ip4.String())
+					}
+				}
+			}
+		}
+	}
+
+	odr.Fg(odroid.ColorMagenta)
+	odr.WriteString("ADDR:")
+	odr.ColorReset()
+	odr.WriteString(addrs.String())
+}
+
+var temperatureKeyReg = regexp.MustCompile("coretemp|input|_")
+
 func SensorsStatus(odr *odroid.OdroidShowBoard) {
-	temps, _ := host.SensorsTemperatures()
+	temps, err := host.SensorsTemperatures()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var builder strings.Builder
-	reg := regexp.MustCompile("coretemp|input|_")
 	tempLower := 40.0
 	tempUpper := 75.0
 	i := 0
@@ -24,7 +79,7 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 	for _, temp := range temps {
 		k := temp.SensorKey
 		if strings.Contains(temp.SensorKey, "_input") {
-			k = reg.ReplaceAllString(k, "")
+			k = temperatureKeyReg.ReplaceAllString(k, "")
 			color := odroid.ColorGreen
 
 			if temp.Temperature < tempUpper && temp.Temperature > tempLower {
@@ -51,7 +106,12 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 }
 
 func OSStatus(odr *odroid.OdroidShowBoard) {
-	uptime, _ := host.Uptime()
+	uptime, err := host.Uptime()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	duration, _ := time.ParseDuration(fmt.Sprintf("%ds", uptime))
 	odr.Fg(odroid.ColorGreen)
 	odr.WriteString("UP:")
@@ -60,7 +120,12 @@ func OSStatus(odr *odroid.OdroidShowBoard) {
 }
 
 func LoadStatus(odr *odroid.OdroidShowBoard) {
-	v, _ := load.Avg()
+	v, err := load.Avg()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	odr.Fg(odroid.ColorCyan)
 	odr.WriteString("LOAD:")
 	odr.ColorReset()
@@ -68,9 +133,14 @@ func LoadStatus(odr *odroid.OdroidShowBoard) {
 }
 
 func MemStatus(odr *odroid.OdroidShowBoard) {
-	v, _ := mem.VirtualMemory()
+	v, err := mem.VirtualMemory()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	odr.Fg(odroid.ColorYellow)
-	odr.WriteString("MEM: ")
+	odr.WriteString("MEM:")
 	odr.ColorReset()
 	mem := v.Total / 1000000
 	label := "MB"
@@ -80,6 +150,27 @@ func MemStatus(odr *odroid.OdroidShowBoard) {
 		label = "GB"
 	}
 	odr.WriteString(fmt.Sprintf("%.0f%% %v%s", v.UsedPercent, mem, label))
+}
+
+type sliceFlags []string
+
+func (i *sliceFlags) String() string {
+	return strings.Join(*i, ", ")
+}
+
+func (i *sliceFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
+var mountPoints sliceFlags
+
+func init() {
+	flag.Var(&mountPoints, "mount-point", "Mount points to report usage for")
+	flag.Parse()
+	if len(mountPoints) == 0 {
+		mountPoints = append(mountPoints, "/")
+	}
 }
 
 func main() {
@@ -99,8 +190,11 @@ func main() {
 		odr.WriteString(" ")
 		OSStatus(odr)
 		odr.Ln()
-		SensorsStatus(odr)
+		NetworkStatus(odr)
 		odr.Ln()
+		DisksStatus(odr, mountPoints)
+		odr.Ln()
+		SensorsStatus(odr)
 
 		err = odr.Sync()
 
