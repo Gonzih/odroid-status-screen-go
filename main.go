@@ -194,6 +194,7 @@ func main() {
 		odr.Ln()
 		DisksStatus(odr, mountPoints)
 		odr.Ln()
+		odr.Ln()
 		SensorsStatus(odr)
 
 		err = odr.Sync()
