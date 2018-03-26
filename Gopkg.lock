@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Gonzih/odroid-show-golang"
   packages = ["."]
-  revision = "f138148baaf7c393c86aa13f2e905670c9828c64"
+  revision = "3a33d35a7906cb333cbe33af955422d21f7978b7"
 
 [[projects]]
   name = "github.com/StackExchange/wmi"
@@ -49,7 +49,7 @@
     "unix",
     "windows"
   ]
-  revision = "91ee8cde435411ca3f1cd365e8f20131aed4d0a1"
+  revision = "13d03a9a82fba647c21a0ef8fba44a795d0f0835"
 
 [solve-meta]
   analyzer-name = "dep"
