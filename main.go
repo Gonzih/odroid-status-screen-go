@@ -50,6 +50,7 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 					ip4 := ip.To4()
 					if ip4 != nil {
 						addrs.WriteString(ip4.String())
+						addrs.WriteString(" ")
 					}
 				}
 			}
