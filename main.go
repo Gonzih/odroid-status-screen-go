@@ -143,14 +143,14 @@ func MemStatus(odr *odroid.OdroidShowBoard) {
 	odr.Fg(odroid.ColorYellow)
 	odr.WriteString("MEM:")
 	odr.ColorReset()
-	mem := v.Total / 1000000
+	mem := float64(v.Total) / 1000000
 	label := "MB"
 
 	if mem > 1000 {
 		mem = mem / 1000
 		label = "GB"
 	}
-	odr.WriteString(fmt.Sprintf("%.2f%% %v%s", v.UsedPercent, mem, label))
+	odr.WriteString(fmt.Sprintf("%.0f%% %.2f%s", v.UsedPercent, mem, label))
 }
 
 type sliceFlags []string
@@ -188,7 +188,7 @@ func main() {
 		LoadStatus(odr)
 		odr.Ln()
 		MemStatus(odr)
-		odr.WriteString(" ")
+		odr.Ln()
 		OSStatus(odr)
 		odr.Ln()
 		NetworkStatus(odr)
