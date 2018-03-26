@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Gonzih/odroid-show-golang"
   packages = ["."]
-  revision = "1610cb9a7aed1f7822da835a3916618ac425e89a"
+  revision = "f138148baaf7c393c86aa13f2e905670c9828c64"
 
 [[projects]]
   name = "github.com/StackExchange/wmi"
