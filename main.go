@@ -150,7 +150,7 @@ func MemStatus(odr *odroid.OdroidShowBoard) {
 		mem = mem / 1000
 		label = "GB"
 	}
-	odr.WriteString(fmt.Sprintf("%.0f%% %v%s", v.UsedPercent, mem, label))
+	odr.WriteString(fmt.Sprintf("%.2f%% %v%s", v.UsedPercent, mem, label))
 }
 
 type sliceFlags []string
