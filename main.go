@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gonzih/odroid-show-golang"
+	odroid "github.com/Gonzih/odroid-show-golang"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/load"
@@ -40,7 +40,7 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 		log.Fatal(err)
 	}
 
-	var addrs strings.Builder
+	var addrs []string
 
 	for _, iface := range ifaces {
 		for _, addr := range iface.Addrs {
@@ -49,8 +49,7 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 				if !ip.IsLoopback() {
 					ip4 := ip.To4()
 					if ip4 != nil {
-						addrs.WriteString(ip4.String())
-						addrs.WriteString(" ")
+						addrs = append(addrs, ip4.String())
 					}
 				}
 			}
@@ -60,7 +59,10 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 	odr.Fg(odroid.ColorMagenta)
 	odr.WriteString("ADDR:")
 	odr.ColorReset()
-	odr.WriteString(addrs.String())
+	for _, addr := range addrs {
+		odr.Ln()
+		odr.WriteString(addr)
+	}
 }
 
 var temperatureKeyReg = regexp.MustCompile("coretemp|input|_")
