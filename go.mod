@@ -1,7 +1,7 @@
 module github.com/Gonzih/odroid-status-screen-go
 
 require (
-	github.com/Gonzih/odroid-show-golang v0.0.0-20180326224219-3a33d35a7906
+	github.com/Gonzih/odroid-show-golang v0.0.0-20181231203737-de9a4c9ea973
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705
 	github.com/go-ole/go-ole v1.2.2
 	github.com/shirou/gopsutil v2.18.12+incompatible

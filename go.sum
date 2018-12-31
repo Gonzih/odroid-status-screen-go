@@ -1,5 +1,7 @@
 github.com/Gonzih/odroid-show-golang v0.0.0-20180326224219-3a33d35a7906 h1:uoc867SGfCPYFk2vQbzKCGoa/ch8P5xKTTKAoMM4d+w=
 github.com/Gonzih/odroid-show-golang v0.0.0-20180326224219-3a33d35a7906/go.mod h1:IYDA28jV9617TXfsH39J6LiQwX5nTIzGB2gWZQ6Y/5c=
+github.com/Gonzih/odroid-show-golang v0.0.0-20181231203737-de9a4c9ea973 h1:e0Fn9TSHD3s1lg7/3ORK8lcy3Tgx2itwUVItH8RkMcg=
+github.com/Gonzih/odroid-show-golang v0.0.0-20181231203737-de9a4c9ea973/go.mod h1:btzBQ0tDKxa5rjpaun34DOkIFLKxav95wGVVIcOVXkk=
 github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
 github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
 github.com/go-ole/go-ole v1.2.1/go.mod h1:7FAglXiTm7HKlQRDeOQ6ZNUHidzCWXuZWq/1dTyBNF8=
