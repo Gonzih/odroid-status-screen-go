@@ -35,14 +35,13 @@ func DisksStatus(odr *odroid.OdroidShowBoard, paths []string) {
 
 func GpuStatus(odr *odroid.OdroidShowBoard) {
 	if NVidiaSMIAvailable() {
-
 		odr.Fg(odroid.ColorCyan)
 		odr.WriteString("GPU:")
 		odr.ColorReset()
 
 		util := NVidiaUtilization()
 		temp := NVidiaTemperature()
-		odr.WriteString(fmt.Sprintf("%s %s", util, temp))
+		odr.WriteString(fmt.Sprintf("%4s %4s", temp, util))
 	}
 }
 
