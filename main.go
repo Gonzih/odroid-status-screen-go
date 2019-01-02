@@ -189,12 +189,19 @@ func init() {
 	}
 }
 
-func main() {
-	odr, err := odroid.NewOdroidShowBoard("/dev/ttyUSB0")
-
+func must(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func main() {
+	files, err := sh("bash", "-c", "ls -1 /dev/ttyUSB*")
+	must(err)
+	ports := strings.Split(string(files), "\n")
+	odr, err := odroid.NewOdroidShowBoard(ports[0])
+
+	must(err)
 
 	odr.Clear()
 
