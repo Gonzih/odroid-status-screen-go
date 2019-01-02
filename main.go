@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,6 +16,11 @@ import (
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	netstatus "github.com/shirou/gopsutil/net"
+)
+
+const (
+	tempLower = 40.0
+	tempUpper = 75.0
 )
 
 func DisksStatus(odr *odroid.OdroidShowBoard, paths []string) {
@@ -33,6 +39,11 @@ func DisksStatus(odr *odroid.OdroidShowBoard, paths []string) {
 	}
 }
 
+type gpuData struct {
+	number float64
+	label  string
+}
+
 func GpuStatus(odr *odroid.OdroidShowBoard) {
 	if NVidiaSMIAvailable() {
 		odr.Fg(odroid.ColorCyan)
@@ -41,7 +52,37 @@ func GpuStatus(odr *odroid.OdroidShowBoard) {
 
 		util := NVidiaUtilization()
 		temp := NVidiaTemperature()
-		odr.WriteString(fmt.Sprintf("%4s %4s", temp, util))
+		utilNumber, err := strconv.ParseFloat(strings.Replace(util, "%", "", 1), 64)
+		must(err)
+		tempNumber, err := strconv.ParseFloat(strings.Replace(temp, "C", "", 1), 64)
+		must(err)
+
+		data := []gpuData{
+			gpuData{
+				label:  temp,
+				number: tempNumber,
+			},
+			gpuData{
+				label:  util,
+				number: utilNumber,
+			},
+		}
+
+		for _, dp := range data {
+
+			color := odroid.ColorGreen
+
+			if dp.number < tempUpper && dp.number > tempLower {
+				color = odroid.ColorYellow
+			} else if dp.number >= tempUpper {
+				color = odroid.ColorRed
+			}
+
+			odr.Fg(color)
+			odr.WriteString(fmt.Sprintf("%4s ", dp.label))
+			odr.ColorReset()
+		}
+
 	}
 }
 
@@ -87,8 +128,6 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 	}
 
 	var builder strings.Builder
-	tempLower := 40.0
-	tempUpper := 75.0
 	i := 0
 
 	for _, temp := range temps {
