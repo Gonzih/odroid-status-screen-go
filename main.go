@@ -110,12 +110,9 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 	}
 
 	odr.Fg(odroid.ColorMagenta)
-	odr.WriteString("ADDR:")
+	odr.WriteString("IP:")
 	odr.ColorReset()
-	for _, addr := range addrs {
-		odr.Ln()
-		odr.WriteString(addr)
-	}
+	odr.WriteString(strings.Join(addrs, " "))
 }
 
 var temperatureKeyReg = regexp.MustCompile("coretemp|input|_")
@@ -252,7 +249,6 @@ func main() {
 		OSStatus(odr)
 		odr.Ln()
 		NetworkStatus(odr)
-		odr.Ln()
 		DisksStatus(odr, mountPoints)
 		odr.Ln()
 		GpuStatus(odr)
