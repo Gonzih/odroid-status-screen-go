@@ -33,6 +33,19 @@ func DisksStatus(odr *odroid.OdroidShowBoard, paths []string) {
 	}
 }
 
+func GpuStatus(odr *odroid.OdroidShowBoard) {
+	if NVidiaSMIAvailable() {
+
+		odr.Fg(odroid.ColorCyan)
+		odr.WriteString("GPU:")
+		odr.ColorReset()
+
+		util := NVidiaUtilization()
+		temp := NVidiaTemperature()
+		odr.WriteString(fmt.Sprintf("%s %s", util, temp))
+	}
+}
+
 func NetworkStatus(odr *odroid.OdroidShowBoard) {
 	ifaces, err := netstatus.Interfaces()
 
@@ -197,6 +210,7 @@ func main() {
 		odr.Ln()
 		DisksStatus(odr, mountPoints)
 		odr.Ln()
+		GpuStatus(odr)
 		odr.Ln()
 		SensorsStatus(odr)
 
