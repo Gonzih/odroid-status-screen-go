@@ -102,7 +102,10 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 				if !ip.IsLoopback() {
 					ip4 := ip.To4()
 					if ip4 != nil {
-						addrs = append(addrs, ip4.String())
+						ip4str := ip4.String()
+						if strings.HasPrefix(ip4str, "192.168.2.") {
+							addrs = append(addrs, ip4str)
+						}
 					}
 				}
 			}
@@ -249,6 +252,7 @@ func main() {
 		OSStatus(odr)
 		odr.Ln()
 		NetworkStatus(odr)
+		odr.Ln()
 		DisksStatus(odr, mountPoints)
 		odr.Ln()
 		GpuStatus(odr)
