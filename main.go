@@ -132,23 +132,25 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 
 	for _, temp := range temps {
 		k := temp.SensorKey
-		// k = temperatureKeyReg.ReplaceAllString(k, "")
-		color := odroid.ColorGreen
+		if strings.Contains(temp.SensorKey, "_input") {
+			k = temperatureKeyReg.ReplaceAllString(k, "")
+			color := odroid.ColorGreen
 
-		if temp.Temperature < tempUpper && temp.Temperature > tempLower {
-			color = odroid.ColorYellow
-		} else if temp.Temperature >= tempUpper {
-			color = odroid.ColorRed
+			if temp.Temperature < tempUpper && temp.Temperature > tempLower {
+				color = odroid.ColorYellow
+			} else if temp.Temperature >= tempUpper {
+				color = odroid.ColorRed
+			}
+
+			prefix := ""
+
+			if i%2 == 0 {
+				prefix = "\r\n"
+			}
+
+			i++
+			builder.WriteString(fmt.Sprintf("%s\033[3%dm%s:\033[3%dm%.0fC ", prefix, odroid.ColorWhite, k, color, temp.Temperature))
 		}
-
-		prefix := ""
-
-		if i%2 == 0 {
-			prefix = "\r\n"
-		}
-
-		i++
-		builder.WriteString(fmt.Sprintf("%s\033[3%dm%s:\033[3%dm%.0fC ", prefix, odroid.ColorWhite, k, color, temp.Temperature))
 	}
 
 	odr.Fg(odroid.ColorBlue)
