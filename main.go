@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	tempLower = 40.0
+	tempLower = 50.0
 	tempUpper = 75.0
 )
 
