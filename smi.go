@@ -32,7 +32,7 @@ var tempRegexp = regexp.MustCompile(`GPU Current Temp\s+:\s+(\d+\s?C)`)
 func parseTemperatureOutput(input []byte) string {
 	matches := tempRegexp.FindAllSubmatch(input, -1)
 	if len(matches) == 0 || len(matches[0]) < 2 {
-		return ""
+		return "0C"
 	}
 
 	return strings.Replace(string(matches[0][1]), " ", "", -1)
@@ -53,7 +53,7 @@ var utilRegexp = regexp.MustCompile(`Gpu\s+:\s+(\d+\s?%)`)
 func parseUtilizationOutput(input []byte) string {
 	matches := utilRegexp.FindAllSubmatch(input, -1)
 	if len(matches) == 0 || len(matches[0]) < 2 {
-		return ""
+		return "0%"
 	}
 
 	return strings.Replace(string(matches[0][1]), " ", "", -1)

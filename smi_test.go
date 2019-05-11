@@ -72,3 +72,46 @@ GPU 00000000:01:00.0
         Avg                         : 0 %`)
 	assert.Equal(t, parseUtilizationOutput(input), "6%")
 }
+
+func TestUtilizationOutputNA(t *testing.T) {
+	input := []byte(`
+
+==============NVSMI LOG==============
+
+Timestamp                           : Fri May 10 23:54:29 2019
+Driver Version                      : 418.56
+CUDA Version                        : 10.1
+
+Attached GPUs                       : 1
+GPU 00000000:08:00.0
+    Utilization
+        Gpu                         : N/A
+        Memory                      : N/A
+        Encoder                     : N/A
+        Decoder                     : N/A
+    GPU Utilization Samples
+        Duration                    : N/A
+        Number of Samples           : N/A
+        Max                         : N/A
+        Min                         : N/A
+        Avg                         : N/A
+    Memory Utilization Samples
+        Duration                    : N/A
+        Number of Samples           : N/A
+        Max                         : N/A
+        Min                         : N/A
+        Avg                         : N/A
+    ENC Utilization Samples
+        Duration                    : N/A
+        Number of Samples           : N/A
+        Max                         : N/A
+        Min                         : N/A
+        Avg                         : N/A
+    DEC Utilization Samples
+        Duration                    : N/A
+        Number of Samples           : N/A
+        Max                         : N/A
+        Min                         : N/A
+        Avg                         : N/A`)
+	assert.Equal(t, parseUtilizationOutput(input), "0%")
+}

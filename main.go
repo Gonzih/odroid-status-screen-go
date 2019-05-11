@@ -53,9 +53,13 @@ func GpuStatus(odr *odroid.OdroidShowBoard) {
 		util := NVidiaUtilization()
 		temp := NVidiaTemperature()
 		utilNumber, err := strconv.ParseFloat(strings.Replace(util, "%", "", 1), 64)
-		must(err)
+		if err != nil {
+			must(fmt.Errorf(`Error parsing "%s" to float: %s`, util, err))
+		}
 		tempNumber, err := strconv.ParseFloat(strings.Replace(temp, "C", "", 1), 64)
-		must(err)
+		if err != nil {
+			must(fmt.Errorf(`Error parsing "%s" to float: %s`, util, err))
+		}
 
 		data := []gpuData{
 			gpuData{
