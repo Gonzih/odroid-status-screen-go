@@ -122,7 +122,7 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 	odr.WriteString(strings.Join(addrs, " "))
 }
 
-var temperatureKeyReg = regexp.MustCompile("coretemp|input|_")
+var temperatureKeyReg = regexp.MustCompile("coretemp|input|k10temp|_")
 
 func SensorsStatus(odr *odroid.OdroidShowBoard) {
 	temps, err := host.SensorsTemperatures()
