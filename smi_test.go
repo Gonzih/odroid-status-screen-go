@@ -27,7 +27,7 @@ GPU 00000000:01:00.0
         Memory Current Temp         : N/A
         Memory Max Operating Temp   : N/A
 			`)
-	assert.Equal(t, parseTemperatureOutput(input), "31C")
+	assert.Equal(t, parseNvidiaTemperatureOutput(input), "31C")
 }
 
 func TestUtilizationOutput(t *testing.T) {

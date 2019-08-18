@@ -90,6 +90,33 @@ func GpuStatus(odr *odroid.OdroidShowBoard) {
 	}
 }
 
+func NvmeStatus(odr *odroid.OdroidShowBoard) {
+	if NvmeAvailable() {
+		odr.Fg(odroid.ColorCyan)
+		odr.WriteString("NVME:")
+		odr.ColorReset()
+
+		temp := NvmeTemperature()
+		num, err := strconv.ParseFloat(strings.Replace(temp, "C", "", 1), 64)
+		if err != nil {
+			must(fmt.Errorf(`Error parsing "%s" to float: %s`, temp, err))
+		}
+
+		color := odroid.ColorGreen
+
+		if num < tempUpper && num > tempLower {
+			color = odroid.ColorYellow
+		} else if num >= tempUpper {
+			color = odroid.ColorRed
+		}
+
+		odr.Fg(color)
+		odr.WriteString(fmt.Sprintf("%4s ", temp))
+		odr.ColorReset()
+
+	}
+}
+
 func NetworkStatus(odr *odroid.OdroidShowBoard) {
 	ifaces, err := netstatus.Interfaces()
 
@@ -260,6 +287,8 @@ func main() {
 		DisksStatus(odr, mountPoints)
 		odr.Ln()
 		GpuStatus(odr)
+		odr.Ln()
+		NvmeStatus(odr)
 		odr.Ln()
 		SensorsStatus(odr)
 

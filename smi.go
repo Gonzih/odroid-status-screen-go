@@ -2,18 +2,9 @@ package main
 
 import (
 	"log"
-	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 )
-
-func sh(args ...string) ([]byte, error) {
-	log.Printf("$ %s", strings.Join(args, " "))
-	cmd := exec.Command(args[0], args[1:]...)
-	cmd.Stderr = os.Stderr
-	return cmd.Output()
-}
 
 func NVidiaSMIAvailable() bool {
 	out, err := sh("bash", "-c", "which nvidia-smi")
@@ -29,7 +20,7 @@ func NVidiaSMIAvailable() bool {
 // GPU Current Temp            : 62 C
 var tempRegexp = regexp.MustCompile(`GPU Current Temp\s+:\s+(\d+\s?C)`)
 
-func parseTemperatureOutput(input []byte) string {
+func parseNvidiaTemperatureOutput(input []byte) string {
 	matches := tempRegexp.FindAllSubmatch(input, -1)
 	if len(matches) == 0 || len(matches[0]) < 2 {
 		return "0C"
@@ -44,7 +35,7 @@ func NVidiaTemperature() string {
 		panic(err)
 	}
 
-	return parseTemperatureOutput(out)
+	return parseNvidiaTemperatureOutput(out)
 }
 
 // Gpu                         : 6 %
