@@ -92,7 +92,7 @@ func GpuStatus(odr *odroid.OdroidShowBoard) {
 
 func NvmeStatus(odr *odroid.OdroidShowBoard) {
 	if NvmeAvailable() {
-		odr.Fg(odroid.ColorCyan)
+		odr.Fg(odroid.ColorRed)
 		odr.WriteString("NVME:")
 		odr.ColorReset()
 
@@ -286,9 +286,9 @@ func main() {
 		odr.Ln()
 		DisksStatus(odr, mountPoints)
 		odr.Ln()
-		GpuStatus(odr)
-		odr.Ln()
 		NvmeStatus(odr)
+		odr.Ln()
+		GpuStatus(odr)
 		odr.Ln()
 		SensorsStatus(odr)
 
