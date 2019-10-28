@@ -149,7 +149,8 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 	odr.WriteString(strings.Join(addrs, " "))
 }
 
-var temperatureKeyReg = regexp.MustCompile("coretemp|input|k10temp|_")
+var temperatureCleanKeyReg = regexp.MustCompile("coretemp|input|k10temp|_")
+var temperatureReplaceKeyReg = regexp.MustCompile("it8665")
 
 func SensorsStatus(odr *odroid.OdroidShowBoard) {
 	temps, err := host.SensorsTemperatures()
@@ -163,8 +164,10 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 
 	for _, temp := range temps {
 		k := temp.SensorKey
+		println(k)
 		if strings.Contains(temp.SensorKey, "_input") {
-			k = temperatureKeyReg.ReplaceAllString(k, "")
+			k = temperatureCleanKeyReg.ReplaceAllString(k, "")
+			k = temperatureReplaceKeyReg.ReplaceAllString(k, "cpu")
 			color := odroid.ColorGreen
 
 			if temp.Temperature < tempUpper && temp.Temperature > tempLower {
