@@ -164,7 +164,6 @@ func SensorsStatus(odr *odroid.OdroidShowBoard) {
 
 	for _, temp := range temps {
 		k := temp.SensorKey
-		println(k)
 		if strings.Contains(temp.SensorKey, "_input") {
 			k = temperatureCleanKeyReg.ReplaceAllString(k, "")
 			k = temperatureReplaceKeyReg.ReplaceAllString(k, "cpu")
