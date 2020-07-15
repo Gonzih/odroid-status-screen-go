@@ -149,7 +149,7 @@ func NetworkStatus(odr *odroid.OdroidShowBoard) {
 	odr.WriteString(strings.Join(addrs, " "))
 }
 
-var temperatureCleanKeyReg = regexp.MustCompile("coretemp|input|k10temp|_")
+var temperatureCleanKeyReg = regexp.MustCompile("coretemp|input|k10temp|_|composite|sensor")
 var temperatureReplaceKeyReg = regexp.MustCompile("it8665")
 
 func SensorsStatus(odr *odroid.OdroidShowBoard) {
@@ -287,8 +287,6 @@ func main() {
 		NetworkStatus(odr)
 		odr.Ln()
 		DisksStatus(odr, mountPoints)
-		odr.Ln()
-		NvmeStatus(odr)
 		odr.Ln()
 		GpuStatus(odr)
 		odr.Ln()
