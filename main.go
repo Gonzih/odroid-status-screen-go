@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -16,6 +15,7 @@ import (
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	netstatus "github.com/shirou/gopsutil/net"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -239,27 +239,41 @@ func MemStatus(odr *odroid.OdroidShowBoard) {
 	odr.WriteString(fmt.Sprintf("%.0f%% %.2f%s", v.UsedPercent, mem, label))
 }
 
-type sliceFlags []string
-
-func (i *sliceFlags) String() string {
-	return strings.Join(*i, ", ")
-}
-
-func (i *sliceFlags) Set(value string) error {
-	*i = append(*i, value)
-	return nil
-}
-
-var mountPoints sliceFlags
+var mountPoints []string
 var serialPort string
+var reportLoad bool
+var reportMemory bool
+var reportOSStatus bool
+var reportNetworkStatus bool
+var reportDiskStatus bool
+var reportGpuStatus bool
+var reportSensorsStatus bool
+
+var rootCmd = &cobra.Command{
+	Use:   "odroid-status-screen-go",
+	Short: "Display system status on odroid board",
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(serialPort) == 0 {
+			files, err := sh("bash", "-c", "ls -1 /dev/ttyUSB*")
+			must(err)
+			ports := strings.Split(string(files), "\n")
+			serialPort = ports[0]
+		}
+		run()
+	},
+}
 
 func init() {
-	flag.Var(&mountPoints, "mount-point", "Mount points to report usage for")
-	flag.StringVar(&serialPort, "serial-port", "", "Seria port to which your board is attached to")
-	flag.Parse()
-	if len(mountPoints) == 0 {
-		mountPoints = append(mountPoints, "/")
-	}
+	// cobra.OnInitialize(initConfig)
+	rootCmd.PersistentFlags().StringVarP(&serialPort, "serial-port", "", "", "Serial port to communicate with odroid on")
+	rootCmd.PersistentFlags().StringSliceVarP(&mountPoints, "mount-point", "", []string{"/"}, "Mount points to monitor for usage")
+	rootCmd.PersistentFlags().BoolVarP(&reportLoad, "report-load", "", true, "Report system load")
+	rootCmd.PersistentFlags().BoolVarP(&reportMemory, "report-memory", "", true, "Report system memory usage")
+	rootCmd.PersistentFlags().BoolVarP(&reportOSStatus, "report-os", "", true, "Report system OS status")
+	rootCmd.PersistentFlags().BoolVarP(&reportNetworkStatus, "report-network", "", true, "Report system Network stats")
+	rootCmd.PersistentFlags().BoolVarP(&reportDiskStatus, "report-disk", "", true, "Report system Disk usage")
+	rootCmd.PersistentFlags().BoolVarP(&reportGpuStatus, "report-gpu", "", true, "Report system GPU usage")
+	rootCmd.PersistentFlags().BoolVarP(&reportSensorsStatus, "report-sensors", "", true, "Report system Temp sensors")
 }
 
 func must(err error) {
@@ -268,43 +282,47 @@ func must(err error) {
 	}
 }
 
-func main() {
-	port := serialPort
-	if len(port) == 0 {
-		files, err := sh("bash", "-c", "ls -1 /dev/ttyUSB*")
-		must(err)
-		ports := strings.Split(string(files), "\n")
-		port = ports[0]
-	}
-	odr, err := odroid.NewOdroidShowBoard(port)
-
+func run() {
+	odr, err := odroid.NewOdroidShowBoard(serialPort)
 	must(err)
-
 	odr.Clear()
 
 	for {
 		odr.CursorReset()
-		LoadStatus(odr)
-		odr.Ln()
-		MemStatus(odr)
-		odr.Ln()
-		OSStatus(odr)
-		odr.Ln()
-		NetworkStatus(odr)
-		odr.Ln()
-		DisksStatus(odr, mountPoints)
-		odr.Ln()
-		GpuStatus(odr)
-		odr.Ln()
-		SensorsStatus(odr)
 
-		err = odr.Sync()
-
-		if err != nil {
-			log.Fatal(err)
+		if reportLoad {
+			LoadStatus(odr)
+			odr.Ln()
+		}
+		if reportMemory {
+			MemStatus(odr)
+			odr.Ln()
+		}
+		if reportOSStatus {
+			OSStatus(odr)
+			odr.Ln()
+		}
+		if reportNetworkStatus {
+			NetworkStatus(odr)
+			odr.Ln()
+		}
+		if reportDiskStatus {
+			DisksStatus(odr, mountPoints)
+			odr.Ln()
+		}
+		if reportGpuStatus {
+			GpuStatus(odr)
+			odr.Ln()
+		}
+		if reportSensorsStatus {
+			SensorsStatus(odr)
 		}
 
+		must(odr.Sync())
 		time.Sleep(time.Second * 2)
 	}
+}
 
+func main() {
+	must(rootCmd.Execute())
 }
