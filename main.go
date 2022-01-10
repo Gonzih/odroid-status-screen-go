@@ -251,9 +251,11 @@ func (i *sliceFlags) Set(value string) error {
 }
 
 var mountPoints sliceFlags
+var serialPort string
 
 func init() {
 	flag.Var(&mountPoints, "mount-point", "Mount points to report usage for")
+	flag.StringVar(&serialPort, "serial-port", "", "Seria port to which your board is attached to")
 	flag.Parse()
 	if len(mountPoints) == 0 {
 		mountPoints = append(mountPoints, "/")
@@ -267,10 +269,14 @@ func must(err error) {
 }
 
 func main() {
-	files, err := sh("bash", "-c", "ls -1 /dev/ttyUSB*")
-	must(err)
-	ports := strings.Split(string(files), "\n")
-	odr, err := odroid.NewOdroidShowBoard(ports[0])
+	port := serialPort
+	if len(port) == 0 {
+		files, err := sh("bash", "-c", "ls -1 /dev/ttyUSB*")
+		must(err)
+		ports := strings.Split(string(files), "\n")
+		port = ports[0]
+	}
+	odr, err := odroid.NewOdroidShowBoard(port)
 
 	must(err)
 
